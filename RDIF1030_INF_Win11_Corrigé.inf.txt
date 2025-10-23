@@ -1,0 +1,176 @@
+; --------------------------------------------------------------
+; BOSS GS-10 - Windows 11 x64 Compatible Driver INF
+; Corrected by Lionel Harvey - 23/10/2025
+; Based on original Roland RDIF1030 (2009)
+; --------------------------------------------------------------
+
+[Version]
+Signature="$Windows NT$"
+Class=MEDIA
+ClassGUID={4d36e96c-e325-11ce-bfc1-08002be10318}
+Provider=%MfgName%
+CatalogFile=RDID1030.CAT
+DriverVer=09/18/2009,1.00.00.0000
+
+; --------------------------------------------------------------
+; Destination paths
+; --------------------------------------------------------------
+
+[DestinationDirs]
+RDID0030.Files.Asio	= 11
+RDID0030.Files.User	= 11
+RDID0030.Files.Inst	= 11
+RDID0030.Files.As32	= 10,syswow64
+RDID0030.Files.Ext	= 10,system32\drivers
+DefaultDestDir 	    = 10,system32\drivers
+
+[SourceDisksNames]
+1=%RDID0030DiskName%,,
+
+[SourceDiskSFiles]
+RDWM1030.SYS=1
+RDAS1030.DLL=1
+RDDP1030.DAT=1
+RDCP1030.CPL=1
+RDCI1030.DLL=1
+RDAW1030.DLL=1
+RDAH1030.DAT=1
+
+; --------------------------------------------------------------
+; Manufacturer sections
+; --------------------------------------------------------------
+
+[Manufacturer]
+%MfgName%=Roland,NTamd64.6.1,NTamd64.6.2,NTamd64.10.0   ; Added Win10/11 compatibility
+
+[Roland]
+;; WindowsVista 64 or Windows XP 64 not supported
+
+[Roland.NTamd64.6.1]
+;; Windows 7
+%RDID0030DeviceDesc%=RDID0030Install, USB\VID_0582&PID_003B ; GS-10
+
+[Roland.NTamd64.6.2]
+;; Windows 8 / 8.1
+%RDID0030DeviceDesc%=RDID0030Install, USB\VID_0582&PID_003B ; GS-10
+
+[Roland.NTamd64.10.0]
+;; Windows 10 / 11
+%RDID0030DeviceDesc%=RDID0030Install, USB\VID_0582&PID_003B ; GS-10
+
+; --------------------------------------------------------------
+; Installation details
+; --------------------------------------------------------------
+
+[RDID0030Install.NTamd64]
+Include=ks.inf,wdmaudio.inf
+Needs=KS.Registration,WDMAUDIO.Registration
+CopyFiles=RDID0030.Files.User,RDID0030.Files.Ext,RDID0030.Files.Asio,RDID0030.Files.As32
+AddReg=RDID0030AddReg
+
+[RDID0030Install.NTamd64.CoInstallers]
+AddReg=RDID0030CoInstallers.AddReg
+CopyFiles=RDID0030.Files.Inst
+
+[RDID0030CoInstallers.AddReg]
+HKR,,CoInstallers32,%REG_MSZ%,"RdCi1030.dll,ProcCoInst"
+
+[RDID0030AddReg]
+HKR,,DevLoader,,"*ntkern"
+HKR,,AssociatedFilters,,"wdmaud,swmidi,redbook"
+HKR,,Driver,,rdwm1030.sys
+HKR,,NTMPDriver,,"rdwm1030.sys"
+
+HKR,Drivers,SubClasses,,"wave,midi,mixer"
+HKR,Drivers\wave\wdmaud.drv,Driver,,wdmaud.drv
+HKR,Drivers\midi\wdmaud.drv,Driver,,wdmaud.drv
+HKR,Drivers\mixer\wdmaud.drv,Driver,,wdmaud.drv
+
+HKR,Drivers\wave\wdmaud.drv,Description,,%RDID0030DeviceDesc%
+HKR,Drivers\midi\wdmaud.drv, Description,,%RDID0030DeviceDesc%
+HKR,Drivers\mixer\wdmaud.drv,Description,,%RDID0030DeviceDesc%
+
+HKLM,%MediaCategories%\%WDM.To11.szPname.GUID%,Name,,%WDM.To11.szPname%
+HKLM,%MediaCategories%\%WDM.To11.szPname.GUID%,Display,1,00,00,00,00
+HKLM,%MediaCategories%\%WDM.Ti11.szPname.GUID%,Name,,%WDM.Ti11.szPname%
+HKLM,%MediaCategories%\%WDM.Ti11.szPname.GUID%,Display,1,00,00,00,00
+
+[RDID0030Install.NTamd64.Services]
+AddService = RDID1030, 0x00000002, RDID0030_Service_Inst
+
+[RDID0030_Service_Inst]
+DisplayName   = %RDID0030DeviceDesc%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %10%\system32\Drivers\rdwm1030.sys
+
+; --------------------------------------------------------------
+; Files to copy
+; --------------------------------------------------------------
+
+[RDID0030.Files.Ext]
+Rdwm1030.sys
+
+[RDID0030.Files.User]
+RDCP1030.CPL
+RDDP1030.DAT
+
+[RDID0030.Files.Inst]
+RdCi1030.dll
+
+[RDID0030.Files.Asio]
+rdas1030.dll
+
+[RDID0030.Files.As32]
+RDAW1030.DLL
+RDAH1030.DAT
+
+; --------------------------------------------------------------
+; Interfaces
+; --------------------------------------------------------------
+
+[RDID0030Install.NTamd64.Interfaces]
+AddInterface=%KSCATEGORY_AUDIO%,%KSNAME_Wo11%,WDM.Interface.Wo11
+AddInterface=%KSCATEGORY_RENDER%,%KSNAME_Wo11%,WDM.Interface.Wo11
+AddInterface=%KSCATEGORY_CAPTURE%,%KSNAME_Wo11%,WDM.Interface.Wo11
+AddInterface=%KSCATEGORY_AUDIO%,%KSNAME_Wi11%,WDM.Interface.Wi11
+AddInterface=%KSCATEGORY_RENDER%,%KSNAME_Wi11%,WDM.Interface.Wi11
+AddInterface=%KSCATEGORY_CAPTURE%,%KSNAME_Wi11%,WDM.Interface.Wi11
+AddInterface=%KSCATEGORY_AUDIO%,%KSNAME_Mo11%,WDM.Interface.Mo11
+AddInterface=%KSCATEGORY_RENDER%,%KSNAME_Mo11%,WDM.Interface.Mo11
+AddInterface=%KSCATEGORY_CAPTURE%,%KSNAME_Mo11%,WDM.Interface.Mo11
+AddInterface=%KSCATEGORY_AUDIO%,%KSNAME_Mi11%,WDM.Interface.Mi11
+AddInterface=%KSCATEGORY_RENDER%,%KSNAME_Mi11%,WDM.Interface.Mi11
+AddInterface=%KSCATEGORY_CAPTURE%,%KSNAME_Mi11%,WDM.Interface.Mi11
+
+; --------------------------------------------------------------
+; Strings and registry data
+; --------------------------------------------------------------
+
+[Strings]
+MfgName="Roland"
+RDID0030DiskName="GS-10 Driver Installation disk"
+RDID0030DeviceDesc="GS-10"
+
+Proxy.CLSID="{17CCA71B-ECD7-11D0-B908-00A0C9223196}"
+KSCATEGORY_AUDIO="{6994AD04-93EF-11D0-A3CC-00A0C9223196}"
+KSCATEGORY_RENDER="{65E8773E-8F56-11D0-A3B9-00A0C9223196}"
+KSCATEGORY_CAPTURE="{65E8773D-8F56-11D0-A3B9-00A0C9223196}"
+
+KSNAME_Wo11="WaveOut1-1"
+WDM.Wo11.szPname="OUT (GS-10)"
+KSNAME_Wi11="WaveIn1-1"
+WDM.Wi11.szPname="IN (GS-10)"
+KSNAME_Mo11="MidiOut1-1"
+WDM.Mo11.szPname="GS-10 MIDI OUT"
+KSNAME_Mi11="MidiIn1-1"
+WDM.Mi11.szPname="GS-10 MIDI IN"
+
+MediaCategories="SYSTEM\CurrentControlSet\Control\MediaCategories"
+WDM.To11.szPname="OUT"
+WDM.Ti11.szPname="IN"
+WDM.To11.szPname.GUID="{41DC355F-EC2B-494a-BE55-8CA692530F63}"
+WDM.Ti11.szPname.GUID="{2CEBC780-0590-43f4-86F7-46927FD23D97}"
+
+REG_MSZ=0x00010000
